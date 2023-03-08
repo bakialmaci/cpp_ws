@@ -1,0 +1,3 @@
+/home/bakialmaci/Desktop/Personal/Cpp_WS/build/CMakeFiles/cpp_ws.dir
+/home/bakialmaci/Desktop/Personal/Cpp_WS/build/CMakeFiles/edit_cache.dir
+/home/bakialmaci/Desktop/Personal/Cpp_WS/build/CMakeFiles/rebuild_cache.dir
