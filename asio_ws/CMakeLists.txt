@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(cpp_ws)
+project(asio_ws)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -11,4 +11,4 @@ set(ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(SRC_ROOT_DIR ${ROOT_DIR}/src)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-add_executable(cpp_ws ${SRC_ROOT_DIR}/multithread_asio.cpp)
+add_executable(asio_ws ${SRC_ROOT_DIR}/multithread_asio.cpp)
