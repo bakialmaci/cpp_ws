@@ -1,14 +1,20 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 
-project(asio_ws)
+# Set the project name
+project(asio_ws VERSION 1.0)
 
-find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-endif()
+# Set the C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(ROOT_DIR ${PROJECT_SOURCE_DIR})
-set(SRC_ROOT_DIR ${ROOT_DIR}/src)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# Set source directory
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-add_executable(asio_ws ${SRC_ROOT_DIR}/multithread_asio.cpp)
+# Add executable targets
+add_executable(asio_ws_async_timer          ${SOURCE_DIR}/async_timer.cpp)
+add_executable(asio_ws_bind_timer           ${SOURCE_DIR}/bind_timer.cpp)
+add_executable(asio_ws_completion_handler   ${SOURCE_DIR}/completion_handler.cpp)
+add_executable(asio_ws_multithread_asio     ${SOURCE_DIR}/multithread_asio.cpp)
+
+# Add flags
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
