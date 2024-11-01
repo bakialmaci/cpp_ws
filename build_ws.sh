@@ -6,6 +6,11 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
+# Install submodules
+echo "Installing submodules..."
+git submodule update --init --recursive
+echo "Submodules installed."
+
 # Get the workspace name from the first argument
 project_ws=$1
 

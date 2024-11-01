@@ -1,0 +1,6 @@
+[submodule "web2os/external/json"]
+	path = web2os/external/json
+	url = https://github.com/nlohmann/json
+[submodule "web2os/external/httplib"]
+	path = web2os/external/httplib
+	url = https://github.com/yhirose/cpp-httplib
