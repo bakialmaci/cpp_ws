@@ -1,0 +1,4 @@
+{
+    "databasePath": "db/web2os.db",
+    "serverPort": 8080
+}

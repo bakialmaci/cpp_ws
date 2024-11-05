@@ -1,17 +1,19 @@
+// Project headers
 #include "server/server.hpp"
-#include "server/router.hpp"
+
+// Standard C++ includes
 #include <iostream>
 
-Server::Server(Database* db) : db_(db) {
-    std::cout << "Server initialized with Database." << std::endl;
+Server::Server(const Config& config) 
+    :   m_database(config.getConfigData()), 
+        m_router(m_http_server, m_database), 
+        m_config_data(config.getConfigData()) 
+{
+    /* Nothing to do for now */
 }
 
-void Server::start(int port) {
-    // Create a Router instance and set up routes
-    Router router(httpServer, db_);
-    router.setupRoutes();
-
+void Server::start() {
     // Start the HTTP server
-    std::cout << "Server is running: http://localhost:" << port << "..." << std::endl;
-    httpServer.listen("localhost", port);
+    std::cout << "Server is running: http://localhost:" << m_config_data.serverPort << std::endl;
+    m_http_server.listen("localhost", m_config_data.serverPort);
 }

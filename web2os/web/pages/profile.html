@@ -10,21 +10,79 @@
     <p>This is your profile page.</p>
     <a href="/logout">Logout</a>
 
+    <h1>Profile Settings</h1>
+    <label for="volume-slider">Volume:</label>
+    <input type="range" id="volume-slider" min="0" max="100" step="1">
+    <span id="volume-value">50</span>
+
     <script>
-        // Fetch the user's profile data when the page loads
-        fetch('/api/profile')
+        // Function to fetch and display the user's profile data
+        function loadProfile() {
+            fetch('/api/profile')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.username) {
+                        document.getElementById('username').textContent = data.username;
+                        loadUserSettings(); // Load user settings immediately after profile data
+                    } else {
+                        console.error('Error: User not logged in.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching profile data:', error);
+                });
+        }
+
+        // Function to fetch and display the user's settings
+        function loadUserSettings() {
+            fetch('/api/settings')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.volume) {
+                        const slider = document.getElementById('volume-slider');
+                        slider.value = data.volume;
+                        document.getElementById('volume-value').textContent = data.volume;
+
+                        // Trigger the input event programmatically to save the initial volume on load
+                        slider.dispatchEvent(new Event('input'));
+                    }
+                })
+                .catch(error => console.error('Error loading settings:', error));
+        }
+
+        // Function to save settings automatically
+        function saveSettings(key, value) {
+            const settings = {};
+            settings[key] = value;
+
+            fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            })
             .then(response => response.json())
             .then(data => {
-                if (data.username) {
-                    // Display the username on the profile page
-                    document.getElementById('username').textContent = data.username;
+                if (data.error) {
+                    console.error("Error: " + data.error);
                 } else {
-                    console.error('Error: User not logged in.');
+                    console.log("Settings saved successfully.");
                 }
             })
-            .catch(error => {
-                console.error('Error fetching profile data:', error);
-            });
+            .catch(error => console.error('Error saving settings:', error));
+        }
+
+        // Event listener for the volume slider
+        const slider = document.getElementById('volume-slider');
+        slider.addEventListener('input', function() {
+            const volume = slider.value;
+            document.getElementById('volume-value').textContent = volume;
+            saveSettings('volume', volume);
+        });
+
+        // Load the profile and settings when the page loads
+        loadProfile();
     </script>
 </body>
 </html>

@@ -29,6 +29,9 @@ set(SOURCES
     ${SRC_DIR}/server/server.cpp
     ${SRC_DIR}/server/router.cpp
     ${SRC_DIR}/database/database.cpp
+    ${SRC_DIR}/config/config.cpp
+    ${SRC_DIR}/server/middleware.cpp
+    ${SRC_DIR}/server/session_manager.cpp
 )
 
 # Create the executable with the specified sources

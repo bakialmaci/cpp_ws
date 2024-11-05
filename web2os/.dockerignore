@@ -1,0 +1,14 @@
+# Ignore build artifacts
+build/
+dist/
+*.o
+*.a
+*.so
+
+# Ignore version control files
+.git
+.gitignore
+
+# Ignore temporary files
+*.swp
+*.log

@@ -3,17 +3,25 @@
 
 #include <string>
 
+struct ConfigData {
+    std::string databasePath;
+    int serverPort;
+};
+
 class Config {
 public:
-    // Constructor to load settings
+    // Constructor that loads the configuration from a file
     Config(const std::string& configFilePath);
 
-    // Method to get the database path
-    std::string getDatabasePath() const;
+    // Getter method to access the configuration data
+    ConfigData getConfigData() const;
 
 private:
-    std::string databasePath_;
+    // Method to load configuration from a file
     void loadConfig(const std::string& configFilePath);
+
+    // Member variable to store the configuration data
+    ConfigData configData_;
 };
 
 #endif // CONFIG_HPP
