@@ -8,7 +8,7 @@
 #include <iostream>
 
 // Global definitions
-const std::string CONFIG_FILE_PATH = "config/config.json";
+const std::string CONFIG_FILE_PATH = "/app/config/config.json";
 
 int main() {
     try {

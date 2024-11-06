@@ -32,10 +32,6 @@ private:
     void handleGetSettings(const httplib::Request&, httplib::Response& res);
     void handleUpdateSettings(const httplib::Request& req, httplib::Response& res);
     void handleLogout(const httplib::Request&, httplib::Response& res);
-
-    // Helper methods for session data management
-    std::string getSessionData(const std::string& key);
-    void setSessionData(const std::string& key, const std::string& value);
 };
 
 #endif // ROUTER_HPP

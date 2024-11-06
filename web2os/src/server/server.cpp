@@ -15,5 +15,5 @@ Server::Server(const Config& config)
 void Server::start() {
     // Start the HTTP server
     std::cout << "Server is running: http://localhost:" << m_config_data.serverPort << std::endl;
-    m_http_server.listen("localhost", m_config_data.serverPort);
+    m_http_server.listen("0.0.0.0", m_config_data.serverPort);
 }

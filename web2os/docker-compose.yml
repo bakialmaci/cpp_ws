@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web2os:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"  # Map port 8080 on the host to port 8080 in the container
+    volumes:
+      - ./config:/app/config  # Mount local config folder to container
+      - ./db:/app/db          # Mount local database folder to container
+      - ./build:/app/build    # Mount local build folder to container
+      - ./web:/app/web        # Mount local build folder to container
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    restart: unless-stopped
+    network_mode: "host" # Use host network mode to access host network

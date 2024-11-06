@@ -1,7 +1,12 @@
+// Project headers
 #include "server/router.hpp"
+
+// Standard C++ includes
 #include <fstream>
 #include <sstream>
 #include <iostream>
+
+// External library includes
 #include <nlohmann/json.hpp>
 
 Router::Router(httplib::Server& http_server, Database& database) 
@@ -14,13 +19,11 @@ Router::Router(httplib::Server& http_server, Database& database)
 }
 
 void Router::setupRoutes() {
-    // Set up routes with proper authentication where needed
+    // Gets
     m_http_server.Get("/", [this](const httplib::Request& req, httplib::Response& res) {
         handleIndex(req, res);
     });
     m_http_server.Get("/profile", [this](const httplib::Request& req, httplib::Response& res) {
-        // authMiddleware_.requireAuth(req, res); // Check authentication
-        // if (!res.location.empty()) return;     // If redirected, do not proceed
         handleProfile(req, res);
     });
     m_http_server.Get("/login", [this](const httplib::Request& req, httplib::Response& res) {
@@ -29,20 +32,12 @@ void Router::setupRoutes() {
     m_http_server.Get("/signup", [this](const httplib::Request& req, httplib::Response& res) {
         handleSignupPage(req, res);
     });
-    m_http_server.Post("/login", [this](const httplib::Request& req, httplib::Response& res) {
-        handleLogin(req, res);
-    });
-    m_http_server.Post("/signup", [this](const httplib::Request& req, httplib::Response& res) {
-        handleSignup(req, res);
-    });
+    // Gets API
     m_http_server.Get("/api/profile", [this](const httplib::Request& req, httplib::Response& res) {
         handleProfileApi(req, res);
     });
     m_http_server.Get("/api/users", [this](const httplib::Request& req, httplib::Response& res) {
         handleGetAllUsers(req, res);
-    });
-    m_http_server.Post("/api/settings", [this](const httplib::Request& req, httplib::Response& res) {
-        handleUpdateSettings(req, res);
     });
     m_http_server.Get("/api/settings", [this](const httplib::Request& req, httplib::Response& res) {
         handleGetSettings(req, res);
@@ -50,23 +45,24 @@ void Router::setupRoutes() {
     m_http_server.Get("/logout", [this](const httplib::Request& req, httplib::Response& res) {
         handleLogout(req, res);
     });
-    std::cout << "Routes setup successfully." << std::endl;
-}
-
-// Helper method to get session data
-std::string Router::getSessionData(const std::string& key) {
-    return m_session_manager.getSessionData(key);
-}
-
-// Helper method to set session data
-void Router::setSessionData(const std::string& key, const std::string& value) {
-    m_session_manager.setSessionData(key, value);
+    // Posts
+    m_http_server.Post("/login", [this](const httplib::Request& req, httplib::Response& res) {
+        handleLogin(req, res);
+    });
+    m_http_server.Post("/signup", [this](const httplib::Request& req, httplib::Response& res) {
+        handleSignup(req, res);
+    });
+    // Posts API
+    m_http_server.Post("/api/settings", [this](const httplib::Request& req, httplib::Response& res) {
+        handleUpdateSettings(req, res);
+    });
+    std::cout << "Routes setup successfully!." << std::endl;
 }
 
 void Router::handleIndex(const httplib::Request&, httplib::Response& res) {
-    std::ifstream file("web/index.html");
+    std::ifstream file("/app/web/index.html");
     if (!file.is_open()) {
-        res.set_content("<h1>404 Not Found</h1>", "text/html");
+        res.set_content("{\"error\": \"404 Not Found\"}", "application/json");
         return;
     }
     std::stringstream buffer;
@@ -76,14 +72,14 @@ void Router::handleIndex(const httplib::Request&, httplib::Response& res) {
 
 void Router::handleProfile(const httplib::Request&, httplib::Response& res) {
     // Check if the profile page exists
-    std::ifstream file("../web/pages/profile.html");
+    std::ifstream file("/app/web/pages/profile.html");
     if (!file.is_open()) {
-        res.set_content("<h1>404 Not Found</h1>", "text/html");
+        res.set_content("{\"error\": \"404 Not Found\"}", "application/json");
         return;
     }
 
     // Check if the user is authenticated
-    std::string username = getSessionData("username");
+    std::string username = m_session_manager.getSessionData("username");
     if (username.empty()) {
         res.set_redirect("/login");
         return;
@@ -103,9 +99,9 @@ void Router::handleProfile(const httplib::Request&, httplib::Response& res) {
 }
 
 void Router::handleLoginPage(const httplib::Request&, httplib::Response& res) {
-    std::ifstream file("../web/pages/login.html");
+    std::ifstream file("/app/web/pages/login.html");
     if (!file.is_open()) {
-        res.set_content("<h1>404 Not Found</h1>", "text/html");
+        res.set_content("{\"error\": \"404 Not Found\"}", "application/json");
         return;
     }
     std::stringstream buffer;
@@ -114,9 +110,9 @@ void Router::handleLoginPage(const httplib::Request&, httplib::Response& res) {
 }
 
 void Router::handleSignupPage(const httplib::Request&, httplib::Response& res) {
-    std::ifstream file("../web/pages/signup.html");
+    std::ifstream file("/app/web/pages/signup.html");
     if (!file.is_open()) {
-        res.set_content("<h1>404 Not Found</h1>", "text/html");
+        res.set_content("{\"error\": \"404 Not Found\"}", "application/json");
         return;
     }
     std::stringstream buffer;
@@ -129,7 +125,7 @@ void Router::handleLogin(const httplib::Request& req, httplib::Response& res) {
     std::string password = req.get_param_value("password");
 
     if (m_database.authenticateUser(username, password)) {
-        setSessionData("username", username); // Store the username in session data
+        m_session_manager.setSessionData("username", username);
         res.set_redirect("/profile"); // Redirect to the profile page on success
     } else {
         res.set_content("{\"error\": \"Invalid username or password.\"}", "application/json");
@@ -148,7 +144,7 @@ void Router::handleSignup(const httplib::Request& req, httplib::Response& res) {
 }
 
 void Router::handleProfileApi(const httplib::Request&, httplib::Response& res) {
-    std::string username = getSessionData("username");
+    std::string username = m_session_manager.getSessionData("username");
     if (username.empty()) {
         res.set_content("{\"error\": \"User not logged in.\"}", "application/json");
         return;
@@ -165,7 +161,7 @@ void Router::handleGetAllUsers(const httplib::Request&, httplib::Response& res) 
 }
 
 void Router::handleGetSettings(const httplib::Request&, httplib::Response& res) {
-    std::string username = getSessionData("username");
+    std::string username = m_session_manager.getSessionData("username");
     if (username.empty()) {
         res.set_content("{\"error\": \"User not logged in.\"}", "application/json");
         return;
@@ -178,7 +174,7 @@ void Router::handleGetSettings(const httplib::Request&, httplib::Response& res) 
 }
 
 void Router::handleUpdateSettings(const httplib::Request& req, httplib::Response& res) {
-    std::string username = getSessionData("username");
+    std::string username = m_session_manager.getSessionData("username");
     if (username.empty()) {
         res.set_content("{\"error\": \"User not logged in.\"}", "application/json");
         return;

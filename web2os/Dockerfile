@@ -1,10 +1,10 @@
-# Step 1: Use an official Ubuntu base image
+# Use an official Ubuntu base image
 FROM ubuntu:22.04
 
-# Step 2: Set environment variables to suppress prompts during package installation
+# Set environment variables to suppress prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Step 3: Install necessary packages and dependencies
+# Install necessary packages and dependencies
 RUN apt-get update && \
     apt-get install -y \
     build-essential \
@@ -14,24 +14,31 @@ RUN apt-get update && \
     libssl-dev \
     wget \
     git \
+    alsa-utils \
     && apt-get clean
 
-# Step 4: Set the working directory inside the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Step 5: Copy all project files from your host machine to the container
+# Copy all project files from your host machine to the container
 COPY . /app
 
-# Step 6: Copy the config.json file into the container
-COPY config/config.json /app/config/config.json
+# Ensure the config and database files are properly copied
+RUN mkdir -p /app/config /app/db /app/web
+COPY config /app/config
+COPY db /app/db
+COPY web /app/web
 
-# Step 7: Build the project using CMake
-RUN mkdir -p build && cd build && \
+# Build the project using CMake
+RUN rm -rf build && mkdir -p build && cd build && \
     cmake .. && \
     make
 
-# Step 8: Expose the port that your application will run on
+# Ensure that the executable is built and available
+RUN ls -l /app/build/bin
+
+# Expose the port that your application will run on
 EXPOSE 8080
 
-# Step 9: Define the command to run your application
+# Define the command to run your application
 CMD ["./build/bin/web2os"]
